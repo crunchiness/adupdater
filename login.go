@@ -1,11 +1,12 @@
-package adupdater
+package main
 
 import (
-	"fmt"
+//    "os"
     "net/url"
 	"net/http"
     "net/http/cookiejar"
-    "io/ioutil"
+    "fmt"
+    "launchpad.net/xmlpath"
 )
 
 func main() {
@@ -25,7 +26,11 @@ func main() {
 
 	resp, _ := client.Get("http://www.sena.lt/skelbimai")
     defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+    root, _ := xmlpath.ParseHTML(resp.Body)
+//    file, _ := os.Open("test.html")
+//    defer file.Close()
+    pageLinks := getPageLinks(root)
+	fmt.Println(pageLinks)
+    editLinks := getEditLinks(root)
+    fmt.Println(len(editLinks))
 }
