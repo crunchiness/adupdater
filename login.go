@@ -1,36 +1,60 @@
 package main
 
 import (
-//    "os"
-    "net/url"
+	"fmt"
+	"launchpad.net/xmlpath"
 	"net/http"
-    "net/http/cookiejar"
-    "fmt"
-    "launchpad.net/xmlpath"
+	"net/http/cookiejar"
+	"net/url"
 )
+
+func reverse(s []string) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
 
 func main() {
 
-    cookieJar, _ := cookiejar.New(nil)
-    client := &http.Client{
-        Jar: cookieJar,
-    }
+	cookieJar, _ := cookiejar.New(nil)
+	client := &http.Client{
+		Jar: cookieJar,
+	}
 
-    loginValues := url.Values{}
-    loginValues.Set("login[username]", username)
-    loginValues.Set("login[password]", password)
+	loginValues := url.Values{}
+	loginValues.Set("login[username]", username)
+	loginValues.Set("login[password]", password)
 
-    loginResp, _ := client.PostForm("http://www.sena.lt/user/login", loginValues)
-    defer loginResp.Body.Close()
+	// login
+	loginResp, _ := client.PostForm("http://www.sena.lt/user/login", loginValues)
+	defer loginResp.Body.Close()
 
-
+	// retrieve the first page of ads
 	resp, _ := client.Get("http://www.sena.lt/skelbimai")
-    defer resp.Body.Close()
-    root, _ := xmlpath.ParseHTML(resp.Body)
-//    file, _ := os.Open("test.html")
-//    defer file.Close()
-    pageLinks := getPageLinks(root)
-	fmt.Println(pageLinks)
-    editLinks := getEditLinks(root)
-    fmt.Println(len(editLinks))
+	defer resp.Body.Close()
+
+	root, _ := xmlpath.ParseHTML(resp.Body)
+
+	// generate links of all pages of items
+	pageLinks := getPageLinks(root)
+
+	// extract editing links from the first page
+	editLinks := getEditLinks(root)
+
+	// extract editing links from the rest of the pages
+	for _, link := range pageLinks {
+		pageResp, _ := client.Get(link)
+		defer pageResp.Body.Close()
+
+		pageRoot, _ := xmlpath.ParseHTML(pageResp.Body)
+		pageEditLinks := getEditLinks(pageRoot)
+		editLinks = append(editLinks, pageEditLinks...)
+	}
+
+	// reverse, newest items need to be renewed last
+	reverse(editLinks)
+
+	for _, link := range editLinks {
+		fmt.Println(link)
+	}
 }
