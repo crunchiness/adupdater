@@ -91,6 +91,10 @@ Content-Disposition: form-data; name="used_item_create[tags]"
 
 
 ------WebKitFormBoundary<rndStr>
+Content-Disposition: form-data; name="photo_radio"
+
+%s
+------WebKitFormBoundary<rndStr>
 Content-Disposition: form-data; name="used_item_create[photo]"; filename=""
 Content-Type: application/octet-stream
 
@@ -115,7 +119,6 @@ Content-Disposition: form-data; name="used_item_create[used_comment]"
 Content-Disposition: form-data; name="used_item_create[valid_for]"
 
 2
-
 ------WebKitFormBoundary<rndStr>
 Content-Disposition: form-data; name="used_item_create[agree]"
 
@@ -134,7 +137,7 @@ Content-Disposition: form-data; name="used_item_create[user_id]"
 %s
 ------WebKitFormBoundary<rndStr>--`
 	rndStr := randomString(16)
-	payload = fmt.Sprintf(strings.Replace(payloadStub, "<rndStr>", rndStr, -1), adData["itemType"], adData["itemAction"], adData["author"], adData["authorJournal"], adData["createItem"], adData["createJournal"], adData["itemCondition"], adData["price"], adData["comment"], adData["itemId"], adData["userId"])
-    boundary = "------WebKitFormBoundary" + rndStr
+	payload = fmt.Sprintf(strings.Replace(payloadStub, "<rndStr>", rndStr, -1), adData["itemType"], adData["itemAction"], adData["author"], adData["authorJournal"], adData["createItem"], adData["createJournal"], adData["photo"], adData["itemCondition"], adData["price"], adData["comment"], adData["itemId"], adData["userId"])
+    boundary = "----WebKitFormBoundary" + rndStr
     return 
 }
