@@ -138,6 +138,6 @@ Content-Disposition: form-data; name="used_item_create[user_id]"
 ------WebKitFormBoundary<rndStr>--`
 	rndStr := randomString(16)
 	payload = fmt.Sprintf(strings.Replace(payloadStub, "<rndStr>", rndStr, -1), adData["itemType"], adData["itemAction"], adData["author"], adData["authorJournal"], adData["createItem"], adData["createJournal"], adData["photo"], adData["itemCondition"], adData["price"], adData["comment"], adData["itemId"], adData["userId"])
-    boundary = "----WebKitFormBoundary" + rndStr
-    return 
+	boundary = "----WebKitFormBoundary" + rndStr
+	return
 }
