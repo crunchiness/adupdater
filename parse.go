@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gopkg.in/xmlpath.v2"
+	"log"
 	"math"
 	"regexp"
 	"strconv"
@@ -11,10 +12,16 @@ import (
 
 func getPageLinks(root *xmlpath.Node) []string {
 	path := xmlpath.MustCompile(`//*[@id="login"]/ul[1]/li[3]/span`)
-	value, _ := path.String(root)
+	value, ok := path.String(root)
+	if !ok {
+		log.Fatal("Not ok")
+	}
 	r, _ := regexp.Compile("[0-9]+")
 	match := r.FindString(value)
-	numBooks, _ := strconv.ParseFloat(match, 64)
+	numBooks, err := strconv.ParseFloat(match, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
 	numPages := int(math.Ceil(numBooks / 50))
 	pageLinks := make([]string, numPages-1)
 	for i := 1; i < numPages; i++ {
@@ -98,7 +105,8 @@ func parseAdPage(root *xmlpath.Node) (map[string]string, error) {
 	if ok {
 		adData["photo"] = value
 	} else {
-		return nil, errors.New(fmt.Sprintf(errorStub, "photo"))
+		fmt.Println("Found no image")
+		//		return nil, errors.New(fmt.Sprintf(errorStub, "photo"))
 	}
 
 	itemConditionX := `//form[@action="/naujas_skelbimas"]//select[@name="used_item_create[item_condition_id]"]/option[@selected]/@value`
